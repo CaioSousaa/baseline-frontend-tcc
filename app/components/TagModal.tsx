@@ -64,9 +64,14 @@ export function TagModal({ isOpen, onClose, onTagCreated, existingTags }: TagMod
       setName("");
       setSelectedColor("");
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Erro ao criar tag:", err);
-      setError(err.response?.data?.message || "Erro ao criar tag. Tente novamente.");
+      if (err instanceof Error && 'response' in err) {
+        const axiosError = err as { response: { data: { message: string } } };
+        setError(axiosError.response?.data?.message || "Erro ao criar tag. Tente novamente.");
+      } else {
+        setError("Erro ao criar tag. Tente novamente.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -77,7 +82,7 @@ export function TagModal({ isOpen, onClose, onTagCreated, existingTags }: TagMod
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200">
         <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50">
           <h2 className="text-xl font-bold text-slate-900">Nova Tag</h2>
-          <button 
+          <button
             onClick={onClose}
             className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all"
           >

@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { api } from "@/lib/axios";
 import { TagModal } from "./TagModal";
+import { Tag, Task } from "../types";
 
 const taskSchema = z.object({
   title: z.string().min(3, "O título deve ter pelo menos 3 caracteres"),
@@ -17,22 +18,6 @@ const taskSchema = z.object({
 });
 
 type TaskFormData = z.infer<typeof taskSchema>;
-
-interface Tag {
-  _id: string;
-  name: string;
-  color: string;
-}
-
-interface Task {
-  _id: string;
-  title: string;
-  description: string;
-  status: 'todo' | 'in_progress' | 'done';
-  priority: 'low' | 'medium' | 'high';
-  dueDate: string;
-  tags: Tag[];
-}
 
 interface TaskModalProps {
   isOpen: boolean;
@@ -75,7 +60,7 @@ export function TaskModal({ isOpen, onClose, onTaskSaved, task }: TaskModalProps
           priority: task.priority,
           dueDate: formattedDate,
         });
-        setSelectedTagIds(task.tags.map(t => t._id));
+        setSelectedTagIds(task.tags.map(t => typeof t === 'string' ? t : t._id));
       } else {
         setIsEditing(true);
         reset({
@@ -139,7 +124,7 @@ export function TaskModal({ isOpen, onClose, onTaskSaved, task }: TaskModalProps
 
   function toggleTag(tagId: string) {
     if (!isEditing) return;
-    setSelectedTagIds(prev => 
+    setSelectedTagIds(prev =>
       prev.includes(tagId) ? prev.filter(id => id !== tagId) : [...prev, tagId]
     );
   }
@@ -178,7 +163,7 @@ export function TaskModal({ isOpen, onClose, onTaskSaved, task }: TaskModalProps
                   {isDeleting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
                 </button>
               )}
-              <button 
+              <button
                 onClick={onClose}
                 className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all"
               >
@@ -261,12 +246,11 @@ export function TaskModal({ isOpen, onClose, onTaskSaved, task }: TaskModalProps
               </div>
             </div>
 
-            {/* Tags Section */}
             <div className="space-y-3">
               <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                 <TagIcon className="w-3 h-3" /> Tags
               </label>
-              
+
               <div className="flex flex-wrap gap-2">
                 {availableTags.map((tag) => {
                   const isSelected = selectedTagIds.includes(tag._id);
@@ -277,15 +261,17 @@ export function TaskModal({ isOpen, onClose, onTaskSaved, task }: TaskModalProps
                       disabled={!isEditing}
                       onClick={() => toggleTag(tag._id)}
                       className={`
-                        px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 text-white border-2
-                        ${isSelected 
-                          ? 'border-slate-900/20 shadow-md scale-105 ring-2 ring-offset-1 ring-blue-500/30' 
-                          : 'border-transparent opacity-70 hover:opacity-100 hover:scale-105'}
+                        px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 text-white
+                        ${isSelected
+                          ? 'shadow-md scale-105'
+                          : 'opacity-70 hover:opacity-100 hover:scale-105'}
+                        ${isSelected && isEditing ? 'ring-2 ring-offset-2 ring-blue-500/50' : ''}
                         ${!isEditing && !isSelected ? 'hidden' : ''}
+                        ${!isEditing ? 'cursor-default' : 'cursor-pointer'}
                       `}
                       style={{ backgroundColor: tag.color }}
                     >
-                      {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                      {isSelected && isEditing && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                       {tag.name}
                     </button>
                   );
@@ -296,7 +282,6 @@ export function TaskModal({ isOpen, onClose, onTaskSaved, task }: TaskModalProps
               </div>
             </div>
 
-            {/* Actions */}
             {isEditing && (
               <div className="flex flex-col md:flex-row gap-3 pt-6 border-t border-slate-100">
                 <button
@@ -306,7 +291,7 @@ export function TaskModal({ isOpen, onClose, onTaskSaved, task }: TaskModalProps
                 >
                   Cancelar
                 </button>
-                
+
                 <div className="flex flex-1 gap-3">
                   <button
                     type="button"
@@ -315,7 +300,7 @@ export function TaskModal({ isOpen, onClose, onTaskSaved, task }: TaskModalProps
                   >
                     <Plus className="w-4 h-4" /> Tag
                   </button>
-                  
+
                   <button
                     type="submit"
                     disabled={isLoading}
