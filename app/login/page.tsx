@@ -42,9 +42,13 @@ export default function LoginPage() {
         localStorage.setItem("@baseline:token", token);
         router.push("/");
       }
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Erro ao realizar login. Tente novamente.";
-      setError(message);
+    } catch (err: unknown) {
+      if (err instanceof Error && 'response' in err) {
+        const axiosError = err as { response: { data: { message: string } } };
+        setError(axiosError.response?.data?.message || "Erro ao realizar login. Tente novamente.");
+      } else {
+        setError("Erro ao realizar login. Tente novamente.");
+      }
     } finally {
       setIsLoading(false);
     }

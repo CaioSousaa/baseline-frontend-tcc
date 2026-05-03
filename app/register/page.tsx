@@ -38,9 +38,13 @@ export default function RegisterPage() {
       await api.post("/user/create", data);
 
       router.push("/login");
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Erro ao criar conta. Tente novamente.";
-      setError(message);
+    } catch (err: unknown) {
+      if (err instanceof Error && 'response' in err) {
+        const axiosError = err as { response: { data: { message: string } } };
+        setError(axiosError.response?.data?.message || "Erro ao criar conta. Tente novamente.");
+      } else {
+        setError("Erro ao criar conta. Tente novamente.");
+      }
     } finally {
       setIsLoading(false);
     }
