@@ -14,7 +14,12 @@ const taskSchema = z.object({
   description: z.string().min(5, "A descrição deve ter pelo menos 5 caracteres"),
   status: z.enum(["todo", "in_progress", "done"]),
   priority: z.enum(["low", "medium", "high"]),
-  dueDate: z.string().min(1, "A data de vencimento é obrigatória"),
+  dueDate: z.string().min(1, "A data de vencimento é obrigatória").refine((date) => {
+    const selectedDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return selectedDate >= today;
+  }, "A data de vencimento não pode ser no passado"),
 });
 
 type TaskFormData = z.infer<typeof taskSchema>;
@@ -33,6 +38,8 @@ export function TaskModal({ isOpen, onClose, onTaskSaved, task }: TaskModalProps
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const {
     register,
@@ -47,49 +54,58 @@ export function TaskModal({ isOpen, onClose, onTaskSaved, task }: TaskModalProps
     },
   });
 
+  const resetForm = () => {
+    if (task) {
+      const formattedDate = new Date(task.dueDate).toISOString().split('T')[0];
+      reset({
+        title: task.title,
+        description: task.description,
+        status: task.status,
+        priority: task.priority,
+        dueDate: formattedDate,
+      });
+      const tags = task.tags || [];
+      setSelectedTagIds(tags.map(t => typeof t === 'string' ? t : t._id));
+    } else {
+      reset({
+        title: "",
+        description: "",
+        status: "todo",
+        priority: "low",
+        dueDate: "",
+      });
+      setSelectedTagIds([]);
+    }
+    setError(null);
+    setIsConfirmingDelete(false);
+  };
+
   useEffect(() => {
     if (isOpen) {
       fetchTags();
-      if (task) {
-        setIsEditing(false);
-        const formattedDate = new Date(task.dueDate).toISOString().split('T')[0];
-        reset({
-          title: task.title,
-          description: task.description,
-          status: task.status,
-          priority: task.priority,
-          dueDate: formattedDate,
-        });
-        setSelectedTagIds(task.tags.map(t => typeof t === 'string' ? t : t._id));
-      } else {
-        setIsEditing(true);
-        reset({
-          title: "",
-          description: "",
-          status: "todo",
-          priority: "low",
-          dueDate: "",
-        });
-        setSelectedTagIds([]);
-      }
+      setIsEditing(!task);
+      resetForm();
     }
-  }, [isOpen, task, reset]);
+  }, [isOpen, task]);
 
   async function fetchTags() {
     try {
       const response = await api.get("/tag/");
-      setAvailableTags(response.data);
+      const data = Array.isArray(response.data) ? response.data : [];
+      setAvailableTags(data);
     } catch (err) {
       console.error("Erro ao carregar tags:", err);
+      setAvailableTags([]);
     }
   }
 
   async function onSubmit(data: TaskFormData) {
     try {
       setIsLoading(true);
+      setError(null);
       const payload = {
         ...data,
-        tags: selectedTagIds,
+        tagId: selectedTagIds,
       };
 
       if (task) {
@@ -100,23 +116,31 @@ export function TaskModal({ isOpen, onClose, onTaskSaved, task }: TaskModalProps
 
       onTaskSaved();
       onClose();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Erro ao salvar tarefa:", err);
+      setError(err.response?.data?.message || "Ocorreu um erro ao salvar a tarefa.");
     } finally {
       setIsLoading(false);
     }
   }
 
   async function handleDelete() {
-    if (!task || !confirm("Tem certeza que deseja excluir esta tarefa?")) return;
+    if (!task) return;
+    if (!isConfirmingDelete) {
+      setIsConfirmingDelete(true);
+      return;
+    }
 
     try {
       setIsDeleting(true);
+      setError(null);
       await api.delete(`/task/${task._id}`);
       onTaskSaved();
       onClose();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Erro ao excluir tarefa:", err);
+      setError(err.response?.data?.message || "Ocorreu um erro ao excluir a tarefa.");
+      setIsConfirmingDelete(false);
     } finally {
       setIsDeleting(false);
     }
@@ -127,6 +151,15 @@ export function TaskModal({ isOpen, onClose, onTaskSaved, task }: TaskModalProps
     setSelectedTagIds(prev =>
       prev.includes(tagId) ? prev.filter(id => id !== tagId) : [...prev, tagId]
     );
+  }
+
+  function handleCancelEdit() {
+    if (task) {
+      setIsEditing(false);
+      resetForm();
+    } else {
+      onClose();
+    }
   }
 
   if (!isOpen) return null;
@@ -154,14 +187,36 @@ export function TaskModal({ isOpen, onClose, onTaskSaved, task }: TaskModalProps
             </div>
             <div className="flex items-center gap-2">
               {task && !isEditing && (
-                <button
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50"
-                  title="Excluir tarefa"
-                >
-                  {isDeleting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
-                </button>
+                <div className="flex items-center gap-1">
+                  {isConfirmingDelete ? (
+                    <div className="flex items-center bg-red-50 border border-red-100 rounded-lg overflow-hidden animate-in slide-in-from-right-2">
+                      <span className="px-3 py-1 text-[10px] font-bold text-red-600 uppercase">Confirmar?</span>
+                      <button
+                        onClick={handleDelete}
+                        disabled={isDeleting}
+                        className="p-2 bg-red-600 text-white hover:bg-red-700 transition-all disabled:opacity-50 border-l border-red-100"
+                        title="Sim, excluir"
+                      >
+                        {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                      </button>
+                      <button
+                        onClick={() => setIsConfirmingDelete(false)}
+                        className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all"
+                        title="Cancelar"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setIsConfirmingDelete(true)}
+                      className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                      title="Excluir tarefa"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  )}
+                </div>
               )}
               <button
                 onClick={onClose}
@@ -240,6 +295,7 @@ export function TaskModal({ isOpen, onClose, onTaskSaved, task }: TaskModalProps
                   type="date"
                   {...register("dueDate")}
                   disabled={!isEditing}
+                  min={new Date().toISOString().split('T')[0]}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-80 cursor-pointer"
                 />
                 {errors.dueDate && <p className="text-xs text-red-500 font-medium">{errors.dueDate.message}</p>}
@@ -282,11 +338,17 @@ export function TaskModal({ isOpen, onClose, onTaskSaved, task }: TaskModalProps
               </div>
             </div>
 
+            {error && (
+              <div className="bg-red-50 border border-red-100 text-red-600 p-3 rounded-lg text-sm font-medium">
+                {error}
+              </div>
+            )}
+
             {isEditing && (
               <div className="flex flex-col md:flex-row gap-3 pt-6 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={task ? () => setIsEditing(false) : onClose}
+                  onClick={handleCancelEdit}
                   className="flex-1 px-4 py-3 border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-all"
                 >
                   Cancelar

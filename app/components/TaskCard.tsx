@@ -16,11 +16,9 @@ const priorityColors = {
 };
 
 export function TaskCard({ task, onClick, allTags }: TaskCardProps) {
-  const taskTags = task.tags.map(t => {
-    if (typeof t === 'string') {
-      return allTags.find(at => at._id === t);
-    }
-    return t;
+  const taskTags = (task.tags || []).map(t => {
+    const tagId = typeof t === 'string' ? t : (t as Tag)._id;
+    return allTags.find(at => at._id === tagId) || (typeof t !== 'string' ? t : null);
   }).filter(Boolean) as Tag[];
 
   return (

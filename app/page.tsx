@@ -36,8 +36,8 @@ export default function Home() {
         api.get("/task/"),
         api.get("/tag/"),
       ]);
-      setTasks(tasksRes.data);
-      setAllTags(tagsRes.data);
+      setTasks(Array.isArray(tasksRes.data) ? tasksRes.data : []);
+      setAllTags(Array.isArray(tagsRes.data) ? tagsRes.data : []);
     } catch (err: unknown) {
       console.error("Erro ao carregar dados:", err);
       setError("Não foi possível carregar seus dados. Tente novamente mais tarde.");
