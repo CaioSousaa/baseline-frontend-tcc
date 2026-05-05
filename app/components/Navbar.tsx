@@ -7,12 +7,14 @@ import { RxGear } from "react-icons/rx";
 import { CiLogout } from "react-icons/ci";
 import { useRouter } from "next/navigation";
 import { NotificationList } from "./NotificationList";
+import { UserModal } from "./UserModal";
 import { api } from "@/lib/axios";
 import { Notification } from "../types";
 
 export function Navbar() {
   const router = useRouter();
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -74,6 +76,7 @@ export function Navbar() {
         </div>
 
         <button
+          onClick={() => setIsUserModalOpen(true)}
           className="p-2.5 text-zinc-900/80 hover:text-zinc-900 transition-all cursor-pointer flex items-center justify-center group"
           title="Configurações"
         >
@@ -88,6 +91,11 @@ export function Navbar() {
           <CiLogout className="w-8 h-8 transition-transform group-hover:translate-x-1" />
         </button>
       </div>
+
+      <UserModal
+        isOpen={isUserModalOpen}
+        onClose={() => setIsUserModalOpen(false)}
+      />
     </nav>
   );
 }
