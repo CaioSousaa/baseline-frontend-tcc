@@ -51,16 +51,16 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="flex-1 flex items-center justify-center p-6">
-      <div className="auth-card">
+    <main className="flex-1 flex items-center justify-center p-6 bg-linear-to-b from-black via-zinc-950 to-zinc-700 min-h-screen">
+      <div className="bg-zinc-900 p-8 rounded-xl h-[600px] shadow-sm border border-zinc-700 w-full max-w-md flex flex-col justify-between">
         <div className="flex flex-col items-center mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">Crie sua conta</h1>
-          <p className="text-slate-500 mt-1">Junte-se a nós para organizar seu dia a dia</p>
+          <h1 className="text-2xl font-bold text-zinc-200">Sign Up</h1>
+          <div className="border-2 border-amber-400 w-14 h-1 bg-amber-400 rounded-xl" />
         </div>
 
-        <form onSubmit={handleSubmit(handleRegister)} className="space-y-4">
+        <form onSubmit={handleSubmit(handleRegister)} className="space-y-6 flex-1 flex flex-col justify-center">
           <div>
-            <label className="block text-sm font-medium text-slate-700" htmlFor="name">
+            <label className="block text-sm font-medium text-zinc-200" htmlFor="name">
               Nome Completo
             </label>
             <input
@@ -75,7 +75,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700" htmlFor="email">
+            <label className="block text-sm font-medium text-zinc-200" htmlFor="email">
               E-mail
             </label>
             <input
@@ -90,7 +90,7 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700" htmlFor="password">
+            <label className="block text-sm font-medium text-zinc-200" htmlFor="password">
               Senha
             </label>
             <input
@@ -105,7 +105,7 @@ export default function RegisterPage() {
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-md text-sm">
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-md text-sm">
               {error}
             </div>
           )}
@@ -122,9 +122,9 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-slate-600">
+        <div className="text-center text-sm text-zinc-200">
           Já tem uma conta?{" "}
-          <Link href="/login" className="text-blue-600 font-semibold hover:underline">
+          <Link href="/login" className="text-amber-400 font-semibold hover:underline">
             Entrar agora
           </Link>
         </div>

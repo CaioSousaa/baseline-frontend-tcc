@@ -11,13 +11,13 @@ interface StatCardProps {
 
 export function StatCard({ title, count, icon, color }: StatCardProps) {
   return (
-    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-      <div className={`p-3 rounded-lg ${color}`}>
+    <div className="bg-zinc-900 p-6 rounded-xl border border-zinc-800 shadow-xl flex items-center gap-4 transition-all hover:border-zinc-700">
+      <div className={`p-3 rounded-xl ${color}`}>
         {icon}
       </div>
       <div>
-        <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">{title}</p>
-        <p className="text-2xl font-bold text-slate-900">{count}</p>
+        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{title}</p>
+        <p className="text-2xl font-bold text-zinc-100">{count}</p>
       </div>
     </div>
   );
