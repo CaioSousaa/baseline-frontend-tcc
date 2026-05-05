@@ -17,6 +17,7 @@ import {
 import { TaskModal } from "./components/TaskModal";
 import { StatCard } from "./components/StatCard";
 import { Column } from "./components/Column";
+import { FilterBar } from "./components/FilterBar";
 import { Tag, Task } from "./types";
 
 export default function Home() {
@@ -27,6 +28,17 @@ export default function Home() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<{
+    status: string[];
+    priority: string[];
+    tags: string[];
+  }>({
+    status: [],
+    priority: [],
+    tags: [],
+  });
 
   const router = useRouter();
 
@@ -56,7 +68,22 @@ export default function Home() {
     void fetchData();
   }, [router, fetchData]);
 
-  const sortedTasks = [...tasks].sort((a, b) => {
+  const filteredTasks = tasks.filter((task) => {
+    const matchesStatus =
+      activeFilters.status.length === 0 || activeFilters.status.includes(task.status);
+    const matchesPriority =
+      activeFilters.priority.length === 0 || activeFilters.priority.includes(task.priority);
+    const matchesTags =
+      activeFilters.tags.length === 0 ||
+      task.tags.some((t) => {
+        const tagId = typeof t === "string" ? t : t._id;
+        return activeFilters.tags.includes(tagId);
+      });
+
+    return matchesStatus && matchesPriority && matchesTags;
+  });
+
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
     const priorityWeight = { high: 3, medium: 2, low: 1 };
     if (priorityWeight[b.priority] !== priorityWeight[a.priority]) {
       return priorityWeight[b.priority] - priorityWeight[a.priority];
@@ -100,9 +127,20 @@ export default function Home() {
             <p className="text-slate-500">Gerencie suas tarefas e acompanhe seu progresso.</p>
           </div>
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
+            <button
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className={`flex items-center gap-2 px-4 py-2 border rounded-lg transition-all shadow-sm ${isFilterOpen || activeFilters.status.length > 0 || activeFilters.priority.length > 0 || activeFilters.tags.length > 0
+                  ? "bg-blue-50 border-blue-200 text-blue-600"
+                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                }`}
+            >
               <Filter className="w-4 h-4" />
               <span>Filtrar</span>
+              {(activeFilters.status.length > 0 || activeFilters.priority.length > 0 || activeFilters.tags.length > 0) && (
+                <span className="flex items-center justify-center w-5 h-5 bg-blue-600 text-white text-[10px] rounded-full font-bold">
+                  {activeFilters.status.length + activeFilters.priority.length + activeFilters.tags.length}
+                </span>
+              )}
             </button>
             <button
               onClick={() => handleOpenTaskModal(null)}
@@ -113,6 +151,14 @@ export default function Home() {
             </button>
           </div>
         </div>
+
+        <FilterBar
+          isOpen={isFilterOpen}
+          onClose={() => setIsFilterOpen(false)}
+          allTags={allTags}
+          filters={activeFilters}
+          onFilterChange={setActiveFilters}
+        />
 
         {error && (
           <div className="bg-red-50 border border-red-100 text-red-600 p-4 rounded-xl mb-8 flex items-center gap-3">
