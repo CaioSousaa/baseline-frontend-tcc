@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Baseline Frontend
 
-## Getting Started
+Interface web para o sistema de gerenciamento de tarefas desenvolvido como projeto de TCC. Construída com Next.js 16, React 19 e TypeScript, consome a [API REST do Baseline Backend](./README-BACKEND.md).
 
-First, run the development server:
+## Funcionalidades
+
+- **Autenticação** — Telas de login e cadastro com validação via React Hook Form + Zod
+- **Painel Kanban** — Visualização de tarefas em colunas por status (A Fazer / Em Andamento / Finalizado)
+- **Estatísticas** — Cards com contagem de tarefas por status
+- **Tarefas** — Criação, edição e exclusão com suporte a título, descrição, prioridade, data de vencimento e tags
+- **Tags** — Categorização de tarefas com cores personalizadas
+- **Ordenação automática** — Tarefas ordenadas por prioridade (alta → baixa) e data de vencimento
+- **Autenticação via JWT** — Token armazenado no `localStorage` e enviado automaticamente em todas as requisições
+
+## Tecnologias
+
+| Camada | Tecnologia |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| UI | React 19 + Tailwind CSS 4 |
+| Ícones | Lucide React |
+| Formulários | React Hook Form + Zod |
+| HTTP | Axios |
+| Linguagem | TypeScript 5 |
+
+## Pré-requisitos
+
+- Node.js 18+
+- [Baseline Backend](./README-BACKEND.md) rodando em `http://localhost:3333`
+
+## Instalação
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/CaioSousaa/baseline-frontend.git
+cd baseline-frontend
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Executando
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Desenvolvimento (com hot-reload)
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Acesse [http://localhost:3000](http://localhost:3000) no navegador.
 
-## Learn More
+```bash
+# Build de produção
+npm run build
+npm start
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Estrutura do projeto
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/
+├── components/
+│   ├── Column.tsx       # Coluna do Kanban com lista de tarefas
+│   ├── Navbar.tsx       # Barra de navegação
+│   ├── StatCard.tsx     # Card de estatística
+│   ├── TagModal.tsx     # Modal de criação/edição de tags
+│   ├── TaskCard.tsx     # Card individual de tarefa
+│   └── TaskModal.tsx    # Modal de criação/edição de tarefas
+├── login/
+│   └── page.tsx         # Tela de login
+├── register/
+│   └── page.tsx         # Tela de cadastro
+├── types/
+│   └── index.ts         # Tipos compartilhados (Task, Tag, etc.)
+├── globals.css
+├── layout.tsx
+└── page.tsx             # Painel principal (Kanban)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+lib/
+└── axios.ts             # Instância do Axios com interceptor de autenticação
+```
 
-## Deploy on Vercel
+## Variáveis de ambiente
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Por padrão, a API é consumida em `http://localhost:3333`. Para alterar, edite [lib/axios.ts](lib/axios.ts):
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```ts
+export const api = axios.create({
+  baseURL: 'http://localhost:3333',
+});
+```
+
+## Backend
+
+Veja a documentação completa da API em [README-BACKEND.md](./README-BACKEND.md).
