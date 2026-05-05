@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #f8fafc;
-  --color-foreground: #0f172a;
-  --color-primary: #3b82f6;
-  --color-primary-foreground: #ffffff;
-  --color-secondary: #64748b;
-  --color-accent: #f1f5f9;
+  --color-background: #09090b;
+  --color-foreground: #e4e4e7;
+  --color-primary: #fbbf24;
+  --color-primary-foreground: #09090b;
+  --color-secondary: #27272a;
+  --color-accent: #18181b;
   --color-error: #ef4444;
-  --color-card: #ffffff;
-  --color-border: #e2e8f0;
+  --color-card: #18181b;
+  --color-border: #27272a;
 }
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #09090b;
+  --foreground: #e4e4e7;
 }
 
 body {
@@ -23,18 +23,30 @@ body {
   font-family: var(--font-geist-sans), sans-serif;
 }
 
-.auth-card {
-  @apply bg-white p-8 rounded-xl shadow-sm border border-slate-200 w-full max-w-md;
-}
-
 .input-field {
-  @apply w-full px-4 py-2 mt-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all;
+  @apply w-full px-4 py-2 mt-1 bg-zinc-800 border border-zinc-700 text-zinc-200 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all placeholder:text-zinc-500;
 }
 
 .btn-primary {
-  @apply w-full bg-blue-600 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply w-full bg-amber-400 text-zinc-900 py-2 px-4 rounded-md font-bold hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
 .error-message {
   @apply text-red-500 text-sm mt-1;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
 }
