@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, AlertCircle } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { Tag, Task } from "../types";
 
 interface TaskCardProps {
@@ -9,11 +9,7 @@ interface TaskCardProps {
   allTags: Tag[];
 }
 
-const priorityColors = {
-  high: "bg-red-100 text-red-700 border-red-200",
-  medium: "bg-amber-100 text-amber-700 border-amber-200",
-  low: "bg-blue-100 text-blue-700 border-blue-200",
-};
+
 
 export function TaskCard({ task, onClick, allTags }: TaskCardProps) {
   const taskTags = (task.tags || []).map(t => {
@@ -24,27 +20,26 @@ export function TaskCard({ task, onClick, allTags }: TaskCardProps) {
   return (
     <div
       onClick={onClick}
-      className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer group"
+      className="bg-zinc-900 p-5 rounded-xl border border-zinc-800 shadow-lg hover:shadow-amber-900/5 hover:border-zinc-700 transition-all cursor-pointer group"
     >
-      <div className="flex justify-between items-start mb-3">
-        <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${priorityColors[task.priority as keyof typeof priorityColors]}`}>
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <h3 className="font-bold text-zinc-100 group-hover:text-amber-400 transition-colors">
+          {task.title}
+        </h3>
+        <span className="text-[10px] font-bold text-zinc-200 uppercase tracking-wider shrink-0 mt-1">
           {task.priority === 'high' ? 'Alta' : task.priority === 'medium' ? 'Média' : 'Baixa'}
         </span>
       </div>
 
-      <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors mb-2">
-        {task.title}
-      </h3>
-
-      <p className="text-sm text-slate-500 line-clamp-2 mb-4">
+      <p className="text-xs text-zinc-400 line-clamp-2 mb-4 leading-relaxed">
         {task.description}
       </p>
 
-      <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
+      <div className="flex items-center justify-between pt-4 border-t border-zinc-800 mt-auto">
         <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-1.5 text-slate-400">
+          <div className="flex items-center gap-1.5 text-zinc-500">
             <Calendar className="w-3.5 h-3.5" />
-            <span className="text-xs">{new Date(task.dueDate).toLocaleDateString('pt-BR')}</span>
+            <span className="text-[10px] font-bold">{new Date(task.dueDate).toLocaleDateString('pt-BR')}</span>
           </div>
 
           <div className="flex gap-1.5 flex-wrap">
@@ -60,9 +55,6 @@ export function TaskCard({ task, onClick, allTags }: TaskCardProps) {
           </div>
         </div>
 
-        {task.priority === 'high' && (
-          <AlertCircle className="w-4 h-4 text-red-500" />
-        )}
       </div>
     </div>
   );

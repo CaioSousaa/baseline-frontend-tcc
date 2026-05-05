@@ -78,13 +78,13 @@ export function TagModal({ isOpen, onClose, onTagCreated, existingTags }: TagMod
   }
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-slate-200">
-        <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50">
-          <h2 className="text-xl font-bold text-slate-900">Nova Tag</h2>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-zinc-800">
+        <div className="flex items-center justify-between p-6 border-b border-zinc-800 bg-zinc-900/50">
+          <h2 className="text-xl font-bold text-zinc-100">Nova Tag</h2>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all"
+            className="p-2 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 rounded-full transition-all"
           >
             <X className="w-5 h-5" />
           </button>
@@ -92,7 +92,7 @@ export function TagModal({ isOpen, onClose, onTagCreated, existingTags }: TagMod
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div className="space-y-2">
-            <label htmlFor="tag-name" className="text-sm font-semibold text-slate-700">
+            <label htmlFor="tag-name" className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
               Nome da Tag
             </label>
             <input
@@ -101,13 +101,13 @@ export function TagModal({ isOpen, onClose, onTagCreated, existingTags }: TagMod
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Ex: Urgente, Estudo, Trabalho..."
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-900"
+              className="w-full px-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400/20 focus:border-amber-400 transition-all text-zinc-100 placeholder:text-zinc-600"
               autoFocus
             />
           </div>
 
           <div className="space-y-3">
-            <label className="text-sm font-semibold text-slate-700">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
               Escolha uma Cor
             </label>
             <div className="grid grid-cols-5 gap-3">
@@ -123,8 +123,8 @@ export function TagModal({ isOpen, onClose, onTagCreated, existingTags }: TagMod
                     onClick={() => setSelectedColor(color)}
                     className={`
                       relative h-10 w-full rounded-xl transition-all flex items-center justify-center
-                      ${isUsed ? 'opacity-20 cursor-not-allowed grayscale' : 'hover:scale-105 active:scale-95 cursor-pointer shadow-sm'}
-                      ${isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : ''}
+                      ${isUsed ? 'opacity-10 cursor-not-allowed grayscale' : 'hover:scale-105 active:scale-95 cursor-pointer shadow-md'}
+                      ${isSelected ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-zinc-900' : ''}
                     `}
                     style={{ backgroundColor: color }}
                     title={isUsed ? "Cor já utilizada" : color}
@@ -137,7 +137,7 @@ export function TagModal({ isOpen, onClose, onTagCreated, existingTags }: TagMod
           </div>
 
           {error && (
-            <p className="text-sm font-medium text-red-500 bg-red-50 p-3 rounded-lg border border-red-100">
+            <p className="text-sm font-bold text-red-400 bg-red-500/10 p-3 rounded-lg border border-red-500/20">
               {error}
             </p>
           )}
@@ -146,14 +146,14 @@ export function TagModal({ isOpen, onClose, onTagCreated, existingTags }: TagMod
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 border border-slate-200 text-slate-600 font-semibold rounded-xl hover:bg-slate-50 transition-all"
+              className="flex-1 px-4 py-2.5 border border-zinc-700 text-zinc-400 font-bold rounded-xl hover:bg-zinc-800 transition-all"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 px-4 py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-md shadow-blue-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2.5 bg-amber-400 text-zinc-900 font-bold rounded-xl hover:bg-amber-500 transition-all shadow-lg shadow-amber-900/20 disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />

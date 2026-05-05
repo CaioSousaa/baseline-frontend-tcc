@@ -12,4 +12,18 @@ export interface Task {
   priority: 'low' | 'medium' | 'high';
   dueDate: string;
   tags: (Tag | string)[];
+  alert?: string;
+}
+
+export interface Notification {
+  _id: string;
+  owner: string;
+  task: {
+    _id: string;
+    title: string;
+    dueDate: string;
+  };
+  message: string;
+  read: boolean;
+  createdAt: string;
 }
